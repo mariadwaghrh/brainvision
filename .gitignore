@@ -1,0 +1,9 @@
+# raw EEG download (30 MB, re-downloaded by 1_generate_topomaps.py)
+mne_data/
+__pycache__/
+*.pyc
+.claude/
+# old copies from the first version
+BrainVisionProject/
+Preview_Output_Images/
+README_AR.txt

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reading Intent from the Brain · BrainVision</title>
+<meta name="description" content="An interactive explainer: EEG brain maps, computer vision features and pattern recognition models predicting left or right hand movement.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<nav class="nav">
+  <a class="brand" href="#top"><span class="pulse"></span>BrainVision</a>
+  <div class="nav-links">
+    <a href="#story" data-t="nav.story"></a>
+    <a href="#vision" data-t="nav.vision"></a>
+    <a href="#patterns" data-t="nav.patterns"></a>
+    <a href="#play" data-t="nav.play"></a>
+    <a href="#limits" data-t="nav.limits"></a>
+  </div>
+  <button class="lang" id="langBtn" aria-label="Switch language">ع</button>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <canvas id="eeg" aria-hidden="true"></canvas>
+  <div class="hero-inner">
+    <p class="kicker" data-t="hero.kicker"></p>
+    <h1 data-t="hero.title"></h1>
+    <p class="lead" data-t="hero.lead"></p>
+    <div class="cta">
+      <a class="btn primary" href="#story" data-t="hero.cta"></a>
+      <a class="btn ghost" href="#vision" data-t="hero.cta2"></a>
+    </div>
+  </div>
+  <div class="hero-stats" id="heroStats"></div>
+  <p class="trace-label mono" data-t="hero.trace"></p>
+</header>
+
+<!-- STORY (scrollytelling) -->
+<section class="chapter" id="story">
+  <div class="chapter-head">
+    <p class="kicker" data-t="story.kicker"></p>
+    <h2 data-t="story.title"></h2>
+    <p class="lead" data-t="story.lead"></p>
+  </div>
+  <div class="scrolly">
+    <div class="steps">
+      <article class="step" data-step="0"><span class="mono tag">01 · <b data-t="s1.tag"></b></span><h3 data-t="s1.title"></h3><p data-t="s1.body"></p></article>
+      <article class="step" data-step="1"><span class="mono tag">02 · <b data-t="s2.tag"></b></span><h3 data-t="s2.title"></h3><p data-t="s2.body"></p></article>
+      <article class="step" data-step="2"><span class="mono tag">03 · <b data-t="s3.tag"></b></span><h3 data-t="s3.title"></h3><p data-t="s3.body"></p></article>
+      <article class="step" data-step="3"><span class="mono tag">04 · <b data-t="s4.tag"></b></span><h3 data-t="s4.title"></h3><p data-t="s4.body"></p></article>
+      <article class="step" data-step="4"><span class="mono tag">05 · <b data-t="s5.tag"></b></span><h3 data-t="s5.title"></h3><p data-t="s5.body"></p></article>
+      <article class="step" data-step="5"><span class="mono tag">06 · <b data-t="s6.tag"></b></span><h3 data-t="s6.title"></h3><p data-t="s6.body"></p></article>
+    </div>
+    <div class="stage-wrap">
+      <div class="stage">
+        <canvas id="stage" width="560" height="560"></canvas>
+        <div class="stage-bar">
+          <span class="mono" id="stageLabel"></span>
+          <div class="dots" id="stageDots"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VISION LAB -->
+<section class="chapter" id="vision">
+  <div class="chapter-head">
+    <p class="kicker cv" data-t="vision.kicker"></p>
+    <h2 data-t="vision.title"></h2>
+    <p class="lead" data-t="vision.lead"></p>
+  </div>
+
+  <div class="picker">
+    <div class="picker-top">
+      <div class="seg" id="classFilter">
+        <button data-c="all" class="on" data-t="f.all"></button>
+        <button data-c="0" data-t="f.left"></button>
+        <button data-c="1" data-t="f.right"></button>
+      </div>
+      <button class="btn small" id="randomBtn">⟳ <span data-t="btn.random"></span></button>
+      <span class="mono current" id="currentName"></span>
+    </div>
+    <div class="gallery" id="gallery" dir="ltr"></div>
+  </div>
+
+  <div class="bento">
+    <div class="tile">
+      <div class="tile-h"><span class="mono">01</span><h3 data-t="cv.raw"></h3></div>
+      <canvas id="cvRaw" width="128" height="128"></canvas>
+      <p class="note" data-t="cv.raw.n"></p>
+    </div>
+    <div class="tile">
+      <div class="tile-h"><span class="mono">02</span><h3 data-t="cv.mask"></h3></div>
+      <canvas id="cvMask" width="128" height="128"></canvas>
+      <label class="slider"><span data-t="cv.radius"></span><input type="range" id="radius" min="20" max="64" value="54"><b id="radiusV">54</b></label>
+      <p class="note" data-t="cv.mask.n"></p>
+    </div>
+    <div class="tile">
+      <div class="tile-h"><span class="mono">03</span><h3 data-t="cv.hsv"></h3></div>
+      <canvas id="cvHsv" width="128" height="128"></canvas>
+      <div class="seg small" id="hsvCh">
+        <button data-ch="0" class="on" data-t="ch.h"></button>
+        <button data-ch="1" data-t="ch.s"></button>
+        <button data-ch="2" data-t="ch.v"></button>
+      </div>
+      <p class="note" data-t="cv.hsv.n"></p>
+    </div>
+    <div class="tile">
+      <div class="tile-h"><span class="mono">04</span><h3 data-t="cv.edge"></h3></div>
+      <canvas id="cvEdge" width="128" height="128"></canvas>
+      <label class="slider"><span data-t="cv.low"></span><input type="range" id="cLow" min="0" max="200" value="50"><b id="cLowV">50</b></label>
+      <label class="slider"><span data-t="cv.high"></span><input type="range" id="cHigh" min="10" max="300" value="150"><b id="cHighV">150</b></label>
+      <p class="note" id="edgeCount"></p>
+    </div>
+    <div class="tile">
+      <div class="tile-h"><span class="mono">05</span><h3 data-t="cv.hog"></h3></div>
+      <canvas id="cvHog" width="256" height="256"></canvas>
+      <label class="check"><input type="checkbox" id="hogOverlay" checked><span data-t="cv.overlay"></span></label>
+      <p class="note" data-t="cv.hog.n"></p>
+    </div>
+    <div class="tile glow">
+      <div class="tile-h"><span class="mono">★</span><h3 data-t="cv.jet"></h3></div>
+      <canvas id="cvJet" width="128" height="128"></canvas>
+      <label class="check"><input type="checkbox" id="jetStretch" checked><span data-t="cv.stretch"></span></label>
+      <p class="note" data-t="cv.jet.n"></p>
+    </div>
+    <div class="tile glow">
+      <div class="tile-h"><span class="mono">★</span><h3 data-t="cv.grid"></h3></div>
+      <canvas id="cvGrid" width="128" height="128"></canvas>
+      <p class="note" data-t="cv.grid.n"></p>
+    </div>
+    <div class="tile glow">
+      <div class="tile-h"><span class="mono">★</span><h3 data-t="cv.mirror"></h3></div>
+      <canvas id="cvMirror" width="128" height="128"></canvas>
+      <p class="note" data-t="cv.mirror.n"></p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3 data-t="hist.title"></h3>
+    <div class="hist-row" dir="ltr">
+      <figure><canvas id="hLeft" width="160" height="160"></canvas><figcaption class="c-left" data-t="hist.left"></figcaption></figure>
+      <span class="op">−</span>
+      <figure><canvas id="hRight" width="160" height="160"></canvas><figcaption class="c-right" data-t="hist.right"></figcaption></figure>
+      <span class="op">=</span>
+      <figure><canvas id="hDiff" width="160" height="160"></canvas><figcaption data-t="hist.diff"></figcaption></figure>
+      <div class="asym" id="asymBox">
+        <p class="mono asym-label" data-t="asym.label"></p>
+        <div class="asym-val" id="asymVal" dir="ltr">–</div>
+        <div class="asym-bar" dir="ltr"><i id="asymMarker"></i></div>
+        <div class="asym-ends" dir="ltr"><span class="c-left" data-t="asym.l"></span><span class="c-right" data-t="asym.r"></span></div>
+        <p class="note" data-t="asym.n"></p>
+      </div>
+    </div>
+    <p class="note" data-t="hist.n"></p>
+  </div>
+</section>
+
+<!-- PATTERN LAB -->
+<section class="chapter" id="patterns">
+  <div class="chapter-head">
+    <p class="kicker pr" data-t="pr.kicker"></p>
+    <h2 data-t="pr.title"></h2>
+    <p class="lead" data-t="pr.lead"></p>
+  </div>
+
+  <div class="pr-grid">
+    <div class="panel scatter-panel">
+      <div class="panel-h">
+        <h3 data-t="sc.title"></h3>
+        <div class="ctrls mono">
+          X <select id="pcX"></select> Y <select id="pcY"></select>
+          <select id="colorBy">
+            <option value="label" data-t="color.label"></option>
+            <option value="svm" data-t="color.svm"></option>
+            <option value="correct" data-t="color.correct"></option>
+          </select>
+        </div>
+      </div>
+      <div class="scatter-wrap" dir="ltr">
+        <canvas id="scatter" width="760" height="460"></canvas>
+        <div class="tooltip" id="tip"></div>
+      </div>
+      <div class="legend" id="scLegend"></div>
+      <p class="note" data-t="sc.n"></p>
+    </div>
+    <div class="panel">
+      <h3 data-t="sel.title"></h3>
+      <div id="sampleCard" class="sample-card"><p class="note" data-t="sel.empty"></p></div>
+    </div>
+  </div>
+
+  <div class="trio">
+    <div class="panel"><h3 data-t="var.title"></h3><canvas id="variance" width="380" height="220"></canvas><p class="note" id="varNote"></p></div>
+    <div class="panel">
+      <div class="panel-h"><h3 data-t="cm.title"></h3>
+        <div class="seg small" id="cmModel"><button data-m="svm" class="on">SVM</button><button data-m="rf">RF</button></div></div>
+      <div id="cm" class="cm"></div>
+      <p class="note" data-t="cm.n"></p>
+    </div>
+    <div class="panel"><h3 data-t="cmp.title"></h3><canvas id="compare" width="380" height="240"></canvas><p class="note" data-t="cmp.n"></p></div>
+  </div>
+
+  <div class="panel knn">
+    <div class="knn-grid">
+      <div>
+        <h3 data-t="knn.title"></h3>
+        <p class="note" data-t="knn.lead"></p>
+        <label class="slider"><span data-t="knn.k"></span><input type="range" id="kVal" min="1" max="31" step="2" value="5"><b id="kValV">5</b></label>
+        <label class="slider"><span data-t="knn.pc"></span><input type="range" id="nPc" min="1" max="20" value="2"><b id="nPcV">2</b></label>
+        <label class="slider"><span data-t="knn.test"></span><input type="range" id="testPct" min="10" max="50" step="5" value="25"><b id="testPctV">25</b></label>
+        <button class="btn small" id="reshuffle">⟳ <span data-t="knn.shuffle"></span></button>
+        <div class="knn-result">
+          <div class="big" id="knnAcc" dir="ltr">–</div>
+          <p class="mono note" data-t="knn.acc"></p>
+          <div id="knnCm" class="cm small"></div>
+        </div>
+      </div>
+      <div>
+        <canvas id="knnMap" width="620" height="420"></canvas>
+        <p class="note" id="knnNote"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLAY -->
+<section class="chapter" id="play">
+  <div class="chapter-head">
+    <p class="kicker" data-t="play.kicker"></p>
+    <h2 data-t="play.title"></h2>
+    <p class="lead" data-t="play.lead"></p>
+  </div>
+  <div class="game">
+    <div class="game-img">
+      <canvas id="gameImg" width="128" height="128"></canvas>
+      <label class="check"><input type="checkbox" id="gameEnhance"><span data-t="play.enh"></span></label>
+    </div>
+    <div class="game-side">
+      <p class="game-q" id="gameResult"></p>
+      <div class="game-btns" dir="ltr">
+        <button class="choice left" id="gL">← <span data-t="play.l"></span></button>
+        <button class="choice right" id="gR"><span data-t="play.r"></span> →</button>
+      </div>
+      <div class="score">
+        <div><span class="mono" data-t="play.you"></span><b id="sYou" dir="ltr">0 / 0</b></div>
+        <div><span class="mono">SVM</span><b id="sSvm" dir="ltr">0 / 0</b></div>
+      </div>
+      <button class="btn ghost small" id="gNext"><span data-t="play.next"></span> →</button>
+    </div>
+  </div>
+</section>
+
+<!-- LIMITS -->
+<section class="chapter" id="limits">
+  <div class="chapter-head">
+    <p class="kicker warn" data-t="lim.kicker"></p>
+    <h2 data-t="lim.title"></h2>
+  </div>
+  <div class="limits">
+    <div class="limit"><span class="mono">A</span><h3 data-t="lim.h1"></h3><p data-t="lim.1"></p></div>
+    <div class="limit"><span class="mono">B</span><h3 data-t="lim.h2"></h3><p data-t="lim.2"></p></div>
+    <div class="limit"><span class="mono">C</span><h3 data-t="lim.h3"></h3><p id="lim3"></p></div>
+  </div>
+</section>
+
+<footer>
+  <p data-t="foot"></p>
+  <p class="mono">Maria Dwaghrh · <a href="https://github.com/mariadwaghrh">github.com/mariadwaghrh</a></p>
+</footer>
+
+<script src="data.js?v=2"></script>
+<script src="i18n_ar.js?v=2"></script>
+<script src="i18n.js?v=2"></script>
+<script src="app.js?v=2"></script>
+</body>
+</html>

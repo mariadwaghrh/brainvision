@@ -1,0 +1,5 @@
+mne
+opencv-python
+scikit-learn
+matplotlib
+numpy
